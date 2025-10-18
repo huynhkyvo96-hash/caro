@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-#define MAX_SIZE 20  // Kích thước tối đa của bàn cờ
+#define MAX_SIZE 20  
+// Kích thước tối đa của bàn cờ
 
 // Hàm khởi tạo bàn cờ (gán ký tự trống '.')
 void initializeBoard(char board[][MAX_SIZE], int size) {
@@ -17,7 +18,7 @@ void printBoard(char board[][MAX_SIZE], int size) {
     printf("\n   ");
 // in theo dòng  (1 2 3 4 ...)
     for (int i = 0; i < size; i++)
-        printf("%2d", i+1);
+        printf("%3d", i+1);
     printf("\n");
 
     for (int i = 0; i < size; i++) {
@@ -25,7 +26,7 @@ void printBoard(char board[][MAX_SIZE], int size) {
         printf("%2d ", i+1);
         // in '.' theo dòng và cột
         for (int j = 0; j < size; j++) {
-            printf(" %c", board[i][j]);
+            printf("%3c", board[i][j]);
         }
 // xuống dòng in tiếp cột 2: "2 . . . . . . ." nếu quá size thì dừng (i<=size và j<=size)
         printf("\n");
@@ -35,7 +36,7 @@ void printBoard(char board[][MAX_SIZE], int size) {
 void runboardgame(int size) {
     char board[MAX_SIZE][MAX_SIZE];//kich thước max của bàn cờ
 
-    if (size >= MAX_SIZE || size <= 0) {
+    if (size > MAX_SIZE || size <= 0) {
         printf("Kich thuoc khong hop le!\n");
         return;
     }
@@ -49,7 +50,7 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
     int row, col;
 
     while (1) { // Lặp cho đến khi nhập hợp lệ
-        printf("Nguoi choi %c, nhap toa do (hang cot): ", player);
+        printf("Nguoi choi %c, nhap toa do (dong cot): ", player);
         scanf("%d %d", &row, &col);
 
         // 🔸 Kiểm tra tọa độ có nằm trong giới hạn bàn cờ không
@@ -74,7 +75,7 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
 void playGame() {
     char board[MAX_SIZE][MAX_SIZE];
     int size;
-    printf("Nhap kich thuoc ban co (15, 19, hoac khac): ");
+    printf("Nhap kich thuoc ban co (0<x<=20): ");
     scanf("%d", &size);
     char currentPlayer = 'X'; // Người chơi bắt đầu là X
     initializeBoard(board, size);
@@ -86,16 +87,18 @@ void playGame() {
         makeMove(board, size, currentPlayer); // Gọi hàm đặt quân
 
         // In lại bàn sau khi người chơi đánh
-      printf("\033[H\033[J");
+      
+        printf("\033[H\033[J");
+        printf("\n   ");
         for (int i = 1; i <= size; i++)
-            printf("%2d", i);
+            printf("%3d", i);
         printf("\n");
 
         for (int i = 0; i < size; i++) 
         {
             printf("%2d ", i + 1);
             for (int j = 0; j < size; j++)
-                printf(" %c", board[i][j]);
+                printf("%3c", board[i][j]);
             printf("\n");
         }
 
