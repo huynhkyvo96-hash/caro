@@ -42,7 +42,7 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
 
     while (1) { // Lặp cho đến khi nhập hợp lệ
         printf("Nguoi choi %c, nhap toa do (dong cot): ", player);
-        scanf("%d %d", &row, &col);
+        int kt = scanf("%d %d", &row, &col);
         if (kt != 2) //nếu là chữ thì k được.
       {
             // dọn bộ đệm khi nhập sai kiểu
