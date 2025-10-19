@@ -35,25 +35,26 @@ void printBoard(char board[][MAX_SIZE], int size) {
 
 // ---------------- PHAN 2: DANH QUAN X / O ----------------
 
-// ⚙️ Hàm này giúp người chơi nhập tọa độ và đặt quân lên bàn cờ
+// Hàm này giúp người chơi nhập tọa độ và đặt quân lên bàn cờ
 void makeMove(char board[][MAX_SIZE], int size, char player)
 {
     int row, col;
 
-    while (1) { // Lặp cho đến khi nhập hợp lệ
+    while (1) // Lặp cho đến khi nhập hợp lệ
+    { 
         printf("Nguoi choi %c, nhap toa do (dong cot): ", player);
         int kt = scanf("%d %d", &row, &col);
         if (kt != 2) //nếu là chữ thì k được.
-      {
+    {
             // dọn bộ đệm khi nhập sai kiểu
-            int c;
-            while ((c = getchar()) != '\n' && c != EOF) {}
+            int c; 
+            while ((c = getchar()) != '\n' && c != EOF) {} //dọn dẹp bộ nhớ đệm tới nút enter  
             printf("Nhap khong hop le. Vui long nhap 2 so.\n");
-            continue;
-        }
+            continue; //quay lại vòng while 
+    }
 
 
-        // 🔸 Kiểm tra tọa độ có nằm trong giới hạn bàn cờ không
+        // Kiểm tra tọa độ có nằm trong giới hạn bàn cờ không
         if (row < 1 || row > size || col < 1 || col > size) {
             printf(" Toa do khong hop le! Vui long nhap lai (1-%d).\n", size);
             continue;
@@ -72,12 +73,14 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
 }
 
 //  Hàm điều khiển lượt chơi luân phiên giữa 2 người
-void playGame() {
+void playGame() 
+{
     int size;
     char board[MAX_SIZE][MAX_SIZE];//kich thước max của bàn cờ
     printf("Nhap kich thuoc ban co (0<x<20): ");
     scanf("%d", &size);
-    if (size > MAX_SIZE || size <= 0) {
+    if (size > MAX_SIZE || size <= 0) 
+    {
         printf("Kich thuoc khong hop le!\n");
         return;
     }
@@ -91,7 +94,7 @@ void playGame() {
 
         // In lại bàn sau khi người chơi đánh
 
-        printf("\033[H\033[J");
+        printf("\033[H\033[J"); 
         printf("\n   ");
         for (int i = 1; i <= size; i++)
             printf("%3d", i);
