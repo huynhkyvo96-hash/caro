@@ -81,8 +81,7 @@ void playGame() {
     printBoard(board, size);
     runboardgame(size);
     // ️ Vòng lặp chơi (mỗi lượt người chơi nhập 1 tọa độ)
-    for (int turn = 0; turn < size * size; turn++) 
-    {
+    for (int turn = 0; turn < size * size; turn++) {
         makeMove(board, size, currentPlayer); // Gọi hàm đặt quân
 
         // In lại bàn sau khi người chơi đánh
@@ -91,8 +90,7 @@ void playGame() {
             printf("%2d", i);
         printf("\n");
 
-        for (int i = 0; i < size; i++) 
-        {
+        for (int i = 0; i < size; i++) {
             printf("%2d ", i + 1);
             for (int j = 0; j < size; j++)
                 printf(" %c", board[i][j]);
