@@ -189,6 +189,105 @@ void playGame()
 
 
 }
+// ---------------- PHẦN 4: LƯU & TẢI LẠI GAME ----------------
+
+// Ghi bàn cờ và lượt chơi hiện tại vào file
+void saveGame(char board[][MAX_SIZE], int size, char currentPlayer) {
+    FILE *f = fopen("save.txt", "w");
+    if (f == NULL) {
+        printf(" Không thể mở file để lưu game.\n");
+        return;
+    }
+
+    fprintf(f, "%d %c\n", size, currentPlayer);
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            fprintf(f, "%c", board[i][j]);
+        }
+        fprintf(f, "\n");
+    }
+
+    fclose(f);
+    printf(" Game đã được lưu thành công vào file save.txt!\n");
+}
+
+// Đọc bàn cờ và lượt chơi từ file
+int loadGame(char board[][MAX_SIZE], int *size, char *currentPlayer) {
+    FILE *f = fopen("save.txt", "r");
+    if (f == NULL) {
+        printf(" Không tìm thấy file save.txt. Hãy bắt đầu game mới.\n");
+        return 0;
+    }
+
+    fscanf(f, "%d %c\n", size, currentPlayer);
+    for (int i = 0; i < *size; i++) {
+        for (int j = 0; j < *size; j++) {
+            fscanf(f, "%c", &board[i][j]);
+        }
+        fgetc(f);
+    }
+
+    fclose(f);
+    printf(" Game đã được tải lại thành công!\n");
+    return 1;
+}
+
+// ---------------- HÀM CHÍNH PLAYGAME ----------------
+// thay bằng hàm play game mới vì cập nhật thêm chức năng save và load
+void playGame() {
+    int size;
+    char board[MAX_SIZE][MAX_SIZE];
+    char currentPlayer = 'X';
+    int choice;
+
+    printf("===== GAME CARO =====\n");
+    printf("1. Bắt đầu game mới\n");
+    printf("2. Tải lại game đã lưu\n");
+    printf("Chọn (1-2): ");
+    scanf("%d", &choice);
+
+    if (choice == 2) {
+        if (!loadGame(board, &size, &currentPlayer)) {
+            printf(" Không thể tải game. Bắt đầu ván mới!\n");
+            printf("Nhập kích thước bàn cờ (0 < x < 20): ");
+            scanf("%d", &size);
+            initializeBoard(board, size);
+        }
+    } else {
+        printf("Nhập kích thước bàn cờ (0 < x < 20): ");
+        scanf("%d", &size);
+        initializeBoard(board, size);
+    }
+
+    printBoard(board, size);
+
+    while (1) {
+        makeMove(board, size, currentPlayer);
+        printBoard(board, size);
+
+        if (checkWin(board, size, currentPlayer)) {
+            printf(" Người chơi %c thắng!\n", currentPlayer);
+            break;
+        }
+
+        if (checkTie(board, size)) {
+            printf(" Hòa rồi!\n");
+            break;
+        }
+
+        //  Hỏi người chơi có muốn lưu game không
+        char ans;
+        printf("Bạn có muốn lưu game lại không (y/n)? ");
+        scanf(" %c", &ans);
+        if (ans == 'y' || ans == 'Y') {
+            saveGame(board, size, currentPlayer);
+        }
+
+        // Đổi lượt
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+    }
+}
+
 
 int main(){
     playGame();
