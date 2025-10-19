@@ -71,7 +71,79 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
         break; // Thoát khỏi vòng lặp
     }
 }
+// Hàm kiểm tra thắng cho player ('X' hoặc 'O').
+// Trả về 1 nếu player có 5 ô liên tiếp theo 1 trong 4 hướng,
+// ngược lại trả về 0.
+int checkWin(char board[][MAX_SIZE], int size, char player) {
+    int i, j, k, count;
 
+    // Kiểm tra hàng ngang
+    for (i = 0; i < size; i++) {
+        for (j = 0; j <= size - 5; j++) {
+            count = 0;
+            for (k = 0; k < 5; k++) {
+                if (board[i][j + k] == player) count++;
+            }
+            if (count == 5) return 1;
+//Vòng i duyệt tất cả các hàng.
+
+//Vòng j duyệt tất cả vị trí bắt đầu có thể của đoạn dài 5 trong hàng: vì đoạn 5 ô bắt đầu tại j và kết thúc j+4, nên j chỉ chạy tới size-5.
+
+//Bên trong, vòng k kiểm tra 5 ô liên tiếp board[i][j+k]. Nếu tất cả 5 đều là player, count==5 → trả về thắng.
+
+//Trả về sớm return 1 để tiết kiệm thời gian (không cần kiểm thêm nếu đã thấy thắng).
+        }
+    }
+
+    // Kiểm tra cột dọc
+    for (i = 0; i <= size - 5; i++) {
+        for (j = 0; j < size; j++) {
+            count = 0;
+            for (k = 0; k < 5; k++) {
+                if (board[i + k][j] == player) count++;
+            }
+            if (count == 5) return 1;
+            //Tương tự, nhưng đổi vai trò hàng/cột: i chạy tới size-5 (vì cần đủ 5 ô theo chiều dọc), j chạy 0..size-1.
+        }
+    }
+
+    // Kiểm tra đường chéo chính (\)
+    for (i = 0; i <= size - 5; i++) {
+        for (j = 0; j <= size - 5; j++) {
+            count = 0;
+            for (k = 0; k < 5; k++) {
+                if (board[i + k][j + k] == player) count++;
+            }
+            if (count == 5) return 1;
+            //Đoạn 5 ô là (i+k, j+k) cho k=0..4. Do đó i và j chỉ cần chạy tới size-5.
+        }
+    }
+
+    // Kiểm tra đường chéo phụ (/)
+    for (i = 4; i < size; i++) {
+        for (j = 0; j <= size - 5; j++) {
+            count = 0;
+            for (k = 0; k < 5; k++) {
+                if (board[i - k][j + k] == player) count++;
+            }
+            if (count == 5) return 1;
+            //Ở hướng /, vị trí bắt đầu thường ở hàng lớn (vì ta đi lên i-k), nên i bắt đầu từ 4 (đảm bảo i-4 >= 0) và chạy tới size-1. j là cột bắt đầu ngang như trước.
+        }
+    }
+
+    return 0; // Không thắng
+}
+
+// Hàm kiểm tra hòa
+int checkTie(char board[][MAX_SIZE], int size) {
+    int i, j;
+    for (i = 0; i < size; i++) {
+        for (j = 0; j < size; j++) {
+            if (board[i][j] == '.') return 0; // còn ô trống, chưa hòa
+        }
+    }
+    return 1; // Hòa
+}
 //  Hàm điều khiển lượt chơi luân phiên giữa 2 người
 void playGame() 
 {
