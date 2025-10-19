@@ -145,6 +145,7 @@ int checkTie(char board[][MAX_SIZE], int size) {
     return 1; // Hòa
 }
 //  Hàm điều khiển lượt chơi luân phiên giữa 2 người
+/*
 void playGame() 
 {
     int size;
@@ -189,6 +190,7 @@ void playGame()
 
 
 }
+*/
 // ---------------- PHẦN 4: LƯU & TẢI LẠI GAME ----------------
 
 // Ghi bàn cờ và lượt chơi hiện tại vào file
