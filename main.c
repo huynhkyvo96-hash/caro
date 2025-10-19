@@ -43,6 +43,15 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
     while (1) { // Lặp cho đến khi nhập hợp lệ
         printf("Nguoi choi %c, nhap toa do (dong cot): ", player);
         scanf("%d %d", &row, &col);
+        if (kt != 2) //nếu là chữ thì k được.
+      {
+            // dọn bộ đệm khi nhập sai kiểu
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF) {}
+            printf("Nhap khong hop le. Vui long nhap 2 so.\n");
+            continue;
+        }
+
 
         // 🔸 Kiểm tra tọa độ có nằm trong giới hạn bàn cờ không
         if (row < 1 || row > size || col < 1 || col > size) {
