@@ -41,16 +41,16 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
     int row, col;
 
     while (1) // Lặp cho đến khi nhập hợp lệ
-    { 
+    {
         printf("Nguoi choi %c, nhap toa do (dong cot): ", player);
         int kt = scanf("%d %d", &row, &col);
         if (kt != 2) //nếu là chữ thì k được.
     {
             // dọn bộ đệm khi nhập sai kiểu
-            int c; 
-            while ((c = getchar()) != '\n' && c != EOF) {} //dọn dẹp bộ nhớ đệm tới nút enter  
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF) {} //dọn dẹp bộ nhớ đệm tới nút enter
             printf("Nhap khong hop le. Vui long nhap 2 so.\n");
-            continue; //quay lại vòng while 
+            continue; //quay lại vòng while
     }
 
 
@@ -145,52 +145,50 @@ int checkTie(char board[][MAX_SIZE], int size) {
     return 1; // Hòa
 }
 //  Hàm điều khiển lượt chơi luân phiên giữa 2 người
-/*
-void playGame() 
-{
-    int size;
-    char board[MAX_SIZE][MAX_SIZE];//kich thước max của bàn cờ
-    printf("Nhap kich thuoc ban co (0<x<20): ");
-    scanf("%d", &size);
-    if (size > MAX_SIZE || size <= 0) 
-    {
-        printf("Kich thuoc khong hop le!\n");
-        return;
-    }
-    char currentPlayer = 'X'; // Người chơi bắt đầu là X
-    initializeBoard(board, size);
-    printBoard(board, size);
-    // ️ Vòng lặp chơi (mỗi lượt người chơi nhập 1 tọa độ)
-    for (int turn = 0; turn < size * size; turn++)
-    {
-        makeMove(board, size, currentPlayer); // Gọi hàm đặt quân
+//void playGame()
+//{
+//    int size;
+//    char board[MAX_SIZE][MAX_SIZE];//kich thước max của bàn cờ
+//    printf("Nhap kich thuoc ban co (0<x<20): ");
+//    scanf("%d", &size);
+//    if (size > MAX_SIZE || size <= 0)
+//    {
+//        printf("Kich thuoc khong hop le!\n");
+//        return;
+//    }
+//    char currentPlayer = 'X'; // Người chơi bắt đầu là X
+//    initializeBoard(board, size);
+//    printBoard(board, size);
+//    // ️ Vòng lặp chơi (mỗi lượt người chơi nhập 1 tọa độ)
+//    for (int turn = 0; turn < size * size; turn++)
+//    {
+//        makeMove(board, size, currentPlayer); // Gọi hàm đặt quân
+//
+//        // In lại bàn sau khi người chơi đánh
+//
+//        printf("\033[H\033[J");
+//        printf("\n   ");
+//        for (int i = 1; i <= size; i++)
+//            printf("%3d", i);
+//        printf("\n");
+//
+//        for (int i = 0; i < size; i++)
+//        {
+//            printf("%2d ", i + 1);
+//            for (int j = 0; j < size; j++)
+//                printf("%3c", board[i][j]);
+//            printf("\n");
+//        }
+//
+//        //  Đổi lượt người chơi
+//        if (currentPlayer == 'X')
+//            currentPlayer = 'O';
+//        else
+//            currentPlayer = 'X';
+//    }
 
-        // In lại bàn sau khi người chơi đánh
 
-        printf("\033[H\033[J"); 
-        printf("\n   ");
-        for (int i = 1; i <= size; i++)
-            printf("%3d", i);
-        printf("\n");
-
-        for (int i = 0; i < size; i++)
-        {
-            printf("%2d ", i + 1);
-            for (int j = 0; j < size; j++)
-                printf("%3c", board[i][j]);
-            printf("\n");
-        }
-
-        //  Đổi lượt người chơi
-        if (currentPlayer == 'X')
-            currentPlayer = 'O';
-        else
-            currentPlayer = 'X';
-    }
-
-
-}
-*/
+//}
 // ---------------- PHẦN 4: LƯU & TẢI LẠI GAME ----------------
 
 // Ghi bàn cờ và lượt chơi hiện tại vào file
@@ -289,10 +287,106 @@ void playGame() {
         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
 }
+//==================PHẦN 5: ĐIỂM VÀ HƯỚNG DẪN NGƯỜI CHƠI====================
+#include <string.h>
 
+typedef struct{
+    char name[30];
+    int win,lose,tie;
+} Player;
 
-int main(){
-    playGame();
-    return 0;
+//HÀM LƯU ĐIỂM VÀO FILE THẮNG BAO NHIÊU THUA BAO NHIÊU
+void SaveScores(char Player[],int win,int lose,int tie)
+{
+    FILE *f = fopen("scores.txt","a");// append mode: ghi thêm vào cuối file, đây là chức năng của đọc file trong C.
+    if (f==NULL)
+    {
+        printf("Khong the mo file scores.txt de ghi!\n");
+        return;
+    }
+    fprintf(f, "%s %d %d %d\n",Player,win,lose,tie);
+    fclose(f);
+    printf("Diem cua %s da duoc luu!\n",Player);
 }
 
+//HÀM HIỂN THỊ TOP 10 NGƯỜI CHƠI
+void ShowTopPlayers()
+{
+    FILE *f = fopen("scores.txt","r");
+    if (f==NULL)
+    {
+        printf("Chua co du lieu nguoi choi nao!\n");
+        return;
+    }
+    Player list[100];
+    int count=0;
+
+    while(fscanf(f,"%s %d %d %d",list[count].name,&list[count].win,&list[count].lose,&list[count].tie)==4)
+        count++;
+    fclose(f);
+
+    //Sắp xếp theo số  trận thắng giảm dần
+    for (int i=0; i<count-1; i++)
+        for(int j=i+1; j<count; j++)
+            if(list[i].win < list[j].win)
+            {
+              Player tmp=list[i];
+              list[i]=list[j];
+              list[j]=tmp;
+            }
+     printf("\n=====🏆 TOP 10 NGUOI CHOI 🏆 =====\n");
+     printf("%-15s %-5s %-5s %-5s\n","Ten","Thang","Thua","Hoa");
+
+     for (int i = 0; i<count && i<10; i++)
+        printf("%-15s %-5d %-5d %-5d\n",list[i].name,list[i].win,list[i].lose,list[i].tie);
+}
+
+//HÀM HIỂN THỊ HƯỚNG DẪN
+void ShowInstructions()
+{
+    printf("\n===== HUONG DAN CHOI CARO =====\n");
+    printf("1. Moi nguoi choi nhap toa do (dong cot), vi du: 3 5\n");
+    printf("2. Nguoi choi X di truoc, O di sau.\n");
+    printf("3. Thang khi co 5 quan lien tiep (ngang, doc hoac cheo).\n");
+    printf("4. Co the luu game (y) hoac tai lai game cu.\n");
+    printf("5. Diem thang/thua/hoa se luu trong file scores.txt.\n");
+    printf("===================================\n");
+}
+
+int main(){
+    int option;
+    do
+    {
+     printf("\n===== MENU CHINH =====\n");
+     printf("1. Bat dau game moi\n");
+     printf("2. Tai game da luu\n");
+     printf("3. Xem top 10 nguoi choi\n");
+     printf("4. Xem huong dan choi\n");
+     printf("0. Thoat\n");
+     printf("Chon: ");
+     scanf("%d",&option);
+
+     switch (option) {
+            case 1:
+                playGame();
+                break;
+            case 2:
+                // tải game cũ (gọi playGame() có load)
+                playGame();
+                break;
+            case 3:
+                ShowTopPlayers();
+                break;
+            case 4:
+                ShowInstructions();
+                break;
+            case 0:
+                printf("Tam biet\n");
+                break;
+            default:
+                printf("Lua chon khong hop le, moi nhap lai!\n");
+        }
+    } while (option != 0);
+
+    return 0;
+}
