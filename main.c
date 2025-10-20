@@ -32,6 +32,12 @@ void printBoard(char board[][MAX_SIZE], int size) {
         printf("\n");
     }
 }
+void runboardgame(int size) {
+    if (size <= 0) {
+        printf("Kich thuoc khong hop le!\n");
+        return;
+    }
+}
 
 // ---------------- PHAN 2: DANH QUAN X / O ----------------
 
@@ -196,10 +202,10 @@ void playGame() {
     char currentPlayer = 'X';
         printf("Nhap kich thuoc ban co (axa): ");
         scanf("%d", &size);
+        runboardgame(size);
         initializeBoard(board, size);
-
-
-    printBoard(board, size);
+        printBoard(board, size);
+    
 
     while (1) {
         makeMove(board, size, currentPlayer);
