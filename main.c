@@ -144,51 +144,7 @@ int checkTie(char board[][MAX_SIZE], int size) {
     }
     return 1; // Hòa
 }
-//  Hàm điều khiển lượt chơi luân phiên giữa 2 người
-//void playGame()
-//{
-//    int size;
-//    char board[MAX_SIZE][MAX_SIZE];//kich thước max của bàn cờ
-//    printf("Nhap kich thuoc ban co (0<x<20): ");
-//    scanf("%d", &size);
-//    if (size > MAX_SIZE || size <= 0)
-//    {
-//        printf("Kich thuoc khong hop le!\n");
-//        return;
-//    }
-//    char currentPlayer = 'X'; // Người chơi bắt đầu là X
-//    initializeBoard(board, size);
-//    printBoard(board, size);
-//    // ️ Vòng lặp chơi (mỗi lượt người chơi nhập 1 tọa độ)
-//    for (int turn = 0; turn < size * size; turn++)
-//    {
-//        makeMove(board, size, currentPlayer); // Gọi hàm đặt quân
-//
-//        // In lại bàn sau khi người chơi đánh
-//
-//        printf("\033[H\033[J");
-//        printf("\n   ");
-//        for (int i = 1; i <= size; i++)
-//            printf("%3d", i);
-//        printf("\n");
-//
-//        for (int i = 0; i < size; i++)
-//        {
-//            printf("%2d ", i + 1);
-//            for (int j = 0; j < size; j++)
-//                printf("%3c", board[i][j]);
-//            printf("\n");
-//        }
-//
-//        //  Đổi lượt người chơi
-//        if (currentPlayer == 'X')
-//            currentPlayer = 'O';
-//        else
-//            currentPlayer = 'X';
-//    }
 
-
-//}
 // ---------------- PHẦN 4: LƯU & TẢI LẠI GAME ----------------
 
 // Ghi bàn cờ và lượt chơi hiện tại vào file
@@ -232,32 +188,16 @@ int loadGame(char board[][MAX_SIZE], int *size, char *currentPlayer) {
     return 1;
 }
 
-// ---------------- HÀM CHÍNH PLAYGAME ----------------
-// thay bằng hàm play game mới vì cập nhật thêm chức năng save và load
+// ---------------- HÀM PLAYGAME ----------------
+//  cập nhật thêm chức năng save và load
 void playGame() {
     int size;
     char board[MAX_SIZE][MAX_SIZE];
     char currentPlayer = 'X';
-    int choice;
-
-    printf("===== GAME CARO =====\n");
-    printf("1. Bắt đầu game mới\n");
-    printf("2. Tải lại game đã lưu\n");
-    printf("Chọn (1-2): ");
-    scanf("%d", &choice);
-
-    if (choice == 2) {
-        if (!loadGame(board, &size, &currentPlayer)) {
-            printf(" Không thể tải game. Bắt đầu ván mới!\n");
-            printf("Nhập kích thước bàn cờ (0 < x < 20): ");
-            scanf("%d", &size);
-            initializeBoard(board, size);
-        }
-    } else {
-        printf("Nhập kích thước bàn cờ (0 < x < 20): ");
+        printf("Nhap kich thuoc ban co (axa): ");
         scanf("%d", &size);
         initializeBoard(board, size);
-    }
+
 
     printBoard(board, size);
 
@@ -266,7 +206,7 @@ void playGame() {
         printBoard(board, size);
 
         if (checkWin(board, size, currentPlayer)) {
-            printf(" Người chơi %c thắng!\n", currentPlayer);
+            printf(" Nguoi choi %c thang\n", currentPlayer);
             break;
         }
 
@@ -277,7 +217,7 @@ void playGame() {
 
         //  Hỏi người chơi có muốn lưu game không
         char ans;
-        printf("Bạn có muốn lưu game lại không (y/n)? ");
+        printf("Ban co muon luu game khong (y/n)? ");
         scanf(" %c", &ans);
         if (ans == 'y' || ans == 'Y') {
             saveGame(board, size, currentPlayer);
