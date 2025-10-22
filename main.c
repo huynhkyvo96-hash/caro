@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <ctype.h>
 #define MAX_SIZE 20
 // Kích thước tối đa của bàn cờ
 
@@ -196,17 +196,25 @@ void playGame() {
     char board[MAX_SIZE][MAX_SIZE];
     printf("Nhap kich thuoc ban co (axa): ");
     scanf("%d", &size);
-    if (size <=0 || size > 20) {
-        printf("Kich thuoc khong hop le!\n");
-    return;
-    }
 
+    while (size <= 0)
+    {
+        printf("Kich thuoc khong hop le!\n");
+        printf("Hay nhap lai kich thuoc: ");
+        scanf("%d", &size);
+    }
     char currentPlayer = 'X';
     initializeBoard(board, size);
     printBoard(board, size);
 
     while (1) {
+        char nameX[30], nameO[30];
+        printf("Nhap ten nguoi choi X: ");
+        scanf("%s", nameX);
+        printf("Nhap ten nguoi choi O: ");
+        scanf("%s", nameO);
         makeMove(board, size, currentPlayer);
+        printf("\033[H\033[J");
         printBoard(board, size);
 
         if (checkWin(board, size, currentPlayer)) {
@@ -215,7 +223,7 @@ void playGame() {
         }
 
         if (checkTie(board, size)) {
-            printf(" Hòa rồi!\n");
+            printf(" Hoa roi!\n");
             break;
         }
 
@@ -231,6 +239,7 @@ void playGame() {
         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
 }
+
 //==================PHẦN 5: ĐIỂM VÀ HƯỚNG DẪN NGƯỜI CHƠI====================
 #include <string.h>
 
@@ -238,17 +247,6 @@ typedef struct{
     char name[30];
     int win,lose,tie;
 } Player;
-
-//HÀM LƯU TÊN NGƯỜI CHƠI.
-void InputPlayerName(char *playerName) {
-    printf("Nhap ten nguoi choi: ");
-    fflush(stdin);
-    fgets(playerName, 30, stdin);   // đọc cả khoảng trắng
-    // loại bỏ ký tự '\n' ở cuối (nếu có)
-    size_t len = strlen(playerName);
-    if (len > 0 && playerName[len - 1] == '\n')
-        playerName[len - 1] = '\0';
-}
 
 //HÀM LƯU ĐIỂM VÀO FILE THẮNG BAO NHIÊU THUA BAO NHIÊU
 void SaveScores(char Player[],int win,int lose,int tie)
@@ -327,7 +325,7 @@ int main(){
                 break;
             case 2:
                 // tải game cũ (gọi playGame() có load)
-                playGame();
+                loadGame();
                 break;
             case 3:
                 ShowTopPlayers();
