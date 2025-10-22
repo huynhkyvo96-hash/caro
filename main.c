@@ -239,6 +239,17 @@ typedef struct{
     int win,lose,tie;
 } Player;
 
+//HÀM LƯU TÊN NGƯỜI CHƠI.
+void InputPlayerName(char *playerName) {
+    printf("Nhap ten nguoi choi: ");
+    fflush(stdin);
+    fgets(playerName, 30, stdin);   // đọc cả khoảng trắng
+    // loại bỏ ký tự '\n' ở cuối (nếu có)
+    size_t len = strlen(playerName);
+    if (len > 0 && playerName[len - 1] == '\n')
+        playerName[len - 1] = '\0';
+}
+
 //HÀM LƯU ĐIỂM VÀO FILE THẮNG BAO NHIÊU THUA BAO NHIÊU
 void SaveScores(char Player[],int win,int lose,int tie)
 {
