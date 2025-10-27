@@ -32,11 +32,24 @@ void printBoard(char board[][MAX_SIZE], int size) {
         printf("\n");
     }
 }
-void runboardgame(int size) {
-    if (size <= 0) {
-        printf("Kich thuoc khong hop le!\n");
-        return;
+
+int runboardgame() {
+    int size;
+    while (1) {
+
+        if (scanf("%d", &size) != 1) {
+            printf("Loi: Ban phai nhap mot so nguyen!\n");
+            while (getchar() != '\n'); // xóa bộ đệm nếu nhập chữ
+            continue;
+        }
+        if (size <= 0 || size > 20) {
+            printf("Kich thuoc khong hop le! (1-20)\n");
+            continue;
+        }
+        break;
     }
+    printf("Kich thuoc hop le: %d x %d\n", size, size);
+    return size;
 }
 
 // ---------------- PHAN 2: DANH QUAN X / O ----------------
@@ -200,9 +213,8 @@ void playGame() {
     int size;
     char board[MAX_SIZE][MAX_SIZE];
     char currentPlayer = 'X';
-        printf("Nhap kich thuoc ban co (axa): ");
-        scanf("%d", &size);
-        runboardgame(size);
+    printf("Nhap kich thuoc ban co (1-20): ");
+        size=runboardgame();
         initializeBoard(board, size);
         printBoard(board, size);
 
