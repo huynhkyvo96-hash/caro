@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <ctype.h>
+
 #define MAX_SIZE 20
 // Kích thước tối đa của bàn cờ
 
@@ -32,7 +32,12 @@ void printBoard(char board[][MAX_SIZE], int size) {
         printf("\n");
     }
 }
-
+void runboardgame(int size) {
+    if (size <= 0) {
+        printf("Kich thuoc khong hop le!\n");
+        return;
+    }
+}
 
 // ---------------- PHAN 2: DANH QUAN X / O ----------------
 
@@ -152,7 +157,7 @@ int checkTie(char board[][MAX_SIZE], int size) {
 void saveGame(char board[][MAX_SIZE], int size, char currentPlayer) {
     FILE *f = fopen("save.txt", "w");
     if (f == NULL) {
-        printf(" Không thể mở file để lưu game.\n");
+        printf(" Khong the mo file de luu game.\n");
         return;
     }
 
@@ -165,14 +170,14 @@ void saveGame(char board[][MAX_SIZE], int size, char currentPlayer) {
     }
 
     fclose(f);
-    printf(" Game đã được lưu thành công vào file save.txt!\n");
+    printf(" Game da duoc luu thanh cong vao file save.txt!\n");
 }
 
 // Đọc bàn cờ và lượt chơi từ file
 int loadGame(char board[][MAX_SIZE], int *size, char *currentPlayer) {
     FILE *f = fopen("save.txt", "r");
     if (f == NULL) {
-        printf(" Không tìm thấy file save.txt. Hãy bắt đầu game mới.\n");
+        printf(" Khong tim thay file save.txt. Hay bat dau game moi.\n");
         return 0;
     }
 
@@ -185,7 +190,7 @@ int loadGame(char board[][MAX_SIZE], int *size, char *currentPlayer) {
     }
 
     fclose(f);
-    printf(" Game đã được tải lại thành công!\n");
+    printf(" Game da duoc tai lai thanh cong!\n");
     return 1;
 }
 
@@ -194,27 +199,16 @@ int loadGame(char board[][MAX_SIZE], int *size, char *currentPlayer) {
 void playGame() {
     int size;
     char board[MAX_SIZE][MAX_SIZE];
-    printf("Nhap kich thuoc ban co (axa): ");
-    scanf("%d", &size);
-
-    while (size <= 0)
-    {
-        printf("Kich thuoc khong hop le!\n");
-        printf("Hay nhap lai kich thuoc: ");
-        scanf("%d", &size);
-    }
     char currentPlayer = 'X';
-    initializeBoard(board, size);
-    printBoard(board, size);
+        printf("Nhap kich thuoc ban co (axa): ");
+        scanf("%d", &size);
+        runboardgame(size);
+        initializeBoard(board, size);
+        printBoard(board, size);
+
 
     while (1) {
-        char nameX[30], nameO[30];
-        printf("Nhap ten nguoi choi X: ");
-        scanf("%s", nameX);
-        printf("Nhap ten nguoi choi O: ");
-        scanf("%s", nameO);
         makeMove(board, size, currentPlayer);
-        printf("\033[H\033[J");
         printBoard(board, size);
 
         if (checkWin(board, size, currentPlayer)) {
@@ -223,7 +217,7 @@ void playGame() {
         }
 
         if (checkTie(board, size)) {
-            printf(" Hoa roi!\n");
+            printf(" Hòa rồi!\n");
             break;
         }
 
@@ -236,6 +230,41 @@ void playGame() {
         }
 
         // Đổi lượt
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+    }
+}
+// ---------------- Tiếp tục game ----------------
+void continueGame() {
+    int size;
+    char board[MAX_SIZE][MAX_SIZE];
+    char currentPlayer;
+
+    if (!loadGame(board, &size, &currentPlayer))
+        return; // Không có file thì thoát
+
+    printBoard(board, size);
+
+    while (1) {
+        makeMove(board, size, currentPlayer);
+        printBoard(board, size);
+
+        if (checkWin(board, size, currentPlayer)) {
+            printf("Nguoi choi %c thang!\n", currentPlayer);
+            break;
+        }
+
+        if (checkTie(board, size)) {
+            printf("Hoa roi!\n");
+            break;
+        }
+
+        char ans;
+        printf("Ban co muon luu game khong (y/n)? ");
+        scanf(" %c", &ans);
+        if (ans == 'y' || ans == 'Y') {
+            saveGame(board, size, currentPlayer);
+        }
+
         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
 }
@@ -324,8 +353,7 @@ int main(){
                 playGame();
                 break;
             case 2:
-                // tải game cũ (gọi playGame() có load)
-                loadGame();
+                continueGame();
                 break;
             case 3:
                 ShowTopPlayers();
@@ -343,3 +371,31 @@ int main(){
 
     return 0;
 }
+/*
+int main() {
+    int option;
+    do {
+        printf("\n===== MENU CHINH =====\n");
+        printf("1. Bat dau game moi\n");
+        printf("2. Tai game da luu\n");
+        printf("0. Thoat\n");
+        printf("Chon: ");
+        scanf("%d", &option);
+
+        switch (option) {
+        case 1:
+            playGame();
+            break;
+        case 2:
+            continueGame();
+            break;
+        case 0:
+            printf("Tam biet!\n");
+            break;
+        default:
+            printf("Lua chon khong hop le!\n");
+        }
+    } while (option != 0);
+    return 0;
+}
+*/
