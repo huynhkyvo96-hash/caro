@@ -281,9 +281,6 @@ while (strcasecmp(namex, nameo) == 0);
         if (ans == 'y' || ans == 'Y')
         {
              saveGame(board, size, currentPlayer, namex, nameo);
-            printf("Enter de thoat ve menu chinh...\n");
-            getchar(); getchar(); // nhấn 2 lần Enter để tránh lỗi bộ đệm
-            return;
         }
     }
 }
@@ -329,9 +326,6 @@ void continueGame() {
         if (ans == 'y' || ans == 'Y')
             {
                 saveGame(board, size, currentPlayer, namex, nameo);
-                printf(" Enter de thoat ve menu chinh...\n");
-                getchar(); getchar(); // nhấn 2 lần Enter để tránh lỗi bộ đệm
-            return;
             }
         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
