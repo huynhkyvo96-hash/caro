@@ -1,7 +1,23 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
 #define MAX_SIZE 25
+
+int boardsize;
+char namex[30], nameo[30];
+char currentPlayerGlobal;
+int exitToMenu = 0;
+
+// ===== Prototype =====
+int runboardgame();
+void initializeBoard(char board[][MAX_SIZE], int size);
+void printBoard(char board[][MAX_SIZE], int size);
+void saveGame(char board[][MAX_SIZE], int size, char currentPlayer, char namex[], char nameo[]);
+int loadGame(char board[][MAX_SIZE], int *size, char *currentPlayer, char namex[], char nameo[]);
+void SaveScores(char playerName[], int win, int lose, int tie);
+
+
 // Maximum board size
 
 // Initialize the board (fill with '.')
@@ -55,7 +71,7 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
 
     while (1)
     {
-        printf("Player %c, enter coordinates (row column): ", player);
+        printf("Player %c, enter coordinates (row column) [0 0 = save | 0 1 = exit to menu]: ", player);
         int kt = scanf("%d %d", &row, &col);
         if (kt != 2)
         {
@@ -64,6 +80,20 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
             printf("Invalid input. Please enter 2 numbers.\n");
             continue;
         }
+
+        // --- Lệnh đặc biệt ---
+        if (row == 0 && col == 0) {
+            saveGame(board, boardsize, currentPlayerGlobal, namex, nameo);
+            printf("Game saved! Continue playing...\n");
+            continue;
+        }
+
+        if (row == 0 && col == 1) {
+            printf("Exiting current match, returning to menu...\n");
+            exitToMenu = 1; // báo cho vòng lặp chính biết để thoát ra menu
+            return;
+        }
+        // ---------------------
 
         if (row < 1 || row > size || col < 1 || col > size) {
             printf("Invalid coordinates! Please enter values (1-%d).\n", size);
@@ -79,6 +109,7 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
         break;
     }
 }
+
 
 int checkWin(char board[][MAX_SIZE], int size, char player) {
     int i, j, k, count;
@@ -182,87 +213,34 @@ int loadGame(char board[][MAX_SIZE], int *size, char *currentPlayer, char namex[
 // ---------------- PLAY GAME ----------------
 void playGame()
 {
-    int size;
     char board[MAX_SIZE][MAX_SIZE];
     char currentPlayer = 'X';
-    char namex[30], nameo[30];
+    currentPlayerGlobal = currentPlayer;
+    exitToMenu = 0; // reset cờ thoát
 
     printf("Enter player X name: ");
     scanf(" %[^\n]", namex);
     do {
         printf("Enter player O name: ");
         scanf(" %[^\n]", nameo);
-        if (strcasecmp(namex, nameo) == 0) {
+        if (strcasecmp(namex, nameo) == 0)
             printf("Names are the same. Please enter a different name!\n");
-        }
     } while (strcasecmp(namex, nameo) == 0);
 
     printf("Enter board size (1-%d): ", MAX_SIZE);
-    size = runboardgame();
-    initializeBoard(board, size);
-    printBoard(board, size);
+    boardsize = runboardgame();
+    initializeBoard(board, boardsize);
+    printBoard(board, boardsize);
 
     while (1) {
-        makeMove(board, size, currentPlayer);
+        currentPlayerGlobal = currentPlayer;
+        makeMove(board, boardsize, currentPlayer);
+        if (exitToMenu) return; // người chơi nhập 0 1 → quay lại menu
+
         printf("\033[H\033[J");
-        printBoard(board, size);
+        printBoard(board, boardsize);
 
-        if (checkWin(board, size, currentPlayer)) {
-            printf("Player %c wins!\n", currentPlayer);
-            if (currentPlayer =='X') {
-                SaveScores(namex,1,0,0);
-                SaveScores(nameo,0,1,0);
-            } else {
-                SaveScores(nameo,1,0,0);
-                SaveScores(namex,0,1,0);
-            }
-            break;
-        }
-
-        if (checkTie(board, size)) {
-            printf("It's a tie!\n");
-            SaveScores(namex,0,0,1);
-            SaveScores(nameo,0,0,1);
-            break;
-        }
-
-        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
-        char ans;
-        int c;
-        while ((c = getchar()) != '\n' && c != EOF);
-
-        printf("Press Enter to continue, 's' to save game, 'e' to exit: ");
-        ans = getchar();
-
-        if (ans == 's' || ans == 'S') {
-            saveGame(board, size, currentPlayer, namex, nameo);
-            printf("Game saved!\n");
-            while ((c = getchar()) != '\n' && c != EOF);
-        } else if (ans == 'e' || ans == 'E') {
-           printf("Exiting game early!\n");
-           return;
-        }
-    }
-}
-
-// Continue saved game
-void continueGame() {
-    int size;
-    char board[MAX_SIZE][MAX_SIZE];
-    char currentPlayer;
-    char namex[30], nameo[30];
-
-    if (!loadGame(board, &size, &currentPlayer, namex, nameo))
-        return;
-
-    printBoard(board, size);
-
-    while (1) {
-        makeMove(board, size, currentPlayer);
-        printf("\033[H\033[J");
-        printBoard(board, size);
-
-        if (checkWin(board, size, currentPlayer)) {
+        if (checkWin(board, boardsize, currentPlayer)) {
             printf("Player %c wins!\n", currentPlayer);
             if (currentPlayer == 'X') {
                 SaveScores(namex, 1, 0, 0);
@@ -274,31 +252,62 @@ void continueGame() {
             break;
         }
 
-        if (checkTie(board, size)) {
+        if (checkTie(board, boardsize)) {
             printf("It's a tie!\n");
             SaveScores(namex, 0, 0, 1);
             SaveScores(nameo, 0, 0, 1);
             break;
         }
 
-        char ans;
-        int c;
-        while ((c = getchar()) != '\n' && c != EOF);
-
-        printf("Press Enter to continue, 's' to save game, 'e' to exit: ");
-        ans = getchar();
-
-        if (ans == 's' || ans == 'S') {
-            saveGame(board, size, currentPlayer, namex, nameo);
-            printf("Game saved!\n");
-            while ((c = getchar()) != '\n' && c != EOF);
-        } else if (ans == 'e' || ans == 'E') {
-           printf("Exiting game early!\n");
-           return;
-        }
         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
 }
+
+
+// Continue saved game
+void continueGame() {
+    char board[MAX_SIZE][MAX_SIZE];
+    char currentPlayer;
+
+    if (!loadGame(board, &boardsize, &currentPlayer, namex, nameo))
+        return;
+
+    currentPlayerGlobal = currentPlayer;
+    exitToMenu = 0; // reset cờ
+    printBoard(board, boardsize);
+
+    while (1) {
+        currentPlayerGlobal = currentPlayer;
+        makeMove(board, boardsize, currentPlayer);
+        if (exitToMenu) return; // quay lại menu nếu người chơi nhập 0 1
+
+        printf("\033[H\033[J");
+        printBoard(board, boardsize);
+
+        if (checkWin(board, boardsize, currentPlayer)) {
+            printf("Player %c wins!\n", currentPlayer);
+            if (currentPlayer == 'X') {
+                SaveScores(namex, 1, 0, 0);
+                SaveScores(nameo, 0, 1, 0);
+            } else {
+                SaveScores(nameo, 1, 0, 0);
+                SaveScores(namex, 0, 1, 0);
+            }
+            break;
+        }
+
+        if (checkTie(board, boardsize)) {
+            printf("It's a tie!\n");
+            SaveScores(namex, 0, 0, 1);
+            SaveScores(nameo, 0, 0, 1);
+            break;
+        }
+
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+    }
+}
+
+
 
 // ================== SCORES & INSTRUCTIONS =====================
 typedef struct{
