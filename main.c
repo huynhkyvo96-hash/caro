@@ -213,11 +213,13 @@ void playGame() {
     int size;
     char board[MAX_SIZE][MAX_SIZE];
     char currentPlayer = 'X';
-     char namex[30],nameo[30];
+     char namex[30], nameo[30];
     printf("Nhap ten nguoi choi X: ");
-    scanf("%s",namex);
+    scanf(" %[^\n]", namex);
+    getchar();
     printf("Nhap ten nguoi choi O: ");
-    scanf("%s",nameo);
+    scanf(" %[^\n]", nameo);
+    getchar();
     printf("Nhap kich thuoc ban co (1-%d): ", MAX_SIZE);
         size=runboardgame();
         initializeBoard(board, size);
@@ -277,9 +279,10 @@ void continueGame() {
     char namex[30], nameo[30];
     printf("Nhap ten nguoi choi X: ");
     scanf(" %[^\n]", namex);
+    getchar();
     printf("Nhap ten nguoi choi O: ");
     scanf(" %[^\n]", nameo);
-
+    getchar();
     while (1) {
         makeMove(board, size, currentPlayer);
         system("cls");
