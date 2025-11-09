@@ -42,7 +42,7 @@ int runboardgame() {
             while (getchar() != '\n'); // xóa bộ đệm nếu nhập chữ
             continue;
         }
-        if (size <= 0 || MAX_SIZE > 20) {
+        if (size <= 0 || size > 20) {
             printf("Kich thuoc khong hop le! (1-20)\n");
             continue;
         }
@@ -226,6 +226,7 @@ void playGame() {
     while (1) {
         makeMove(board, size, currentPlayer);
         system("cls");
+        //printf("Neu ban muon luu game bam phim 's'\n");
         printBoard(board, size);
 
         if (checkWin(board, size, currentPlayer)) {
@@ -454,31 +455,4 @@ int main(){
 
     return 0;
 }
-/*
-int main() {
-    int option;
-    do {
-        printf("\n===== MENU CHINH =====\n");
-        printf("1. Bat dau game moi\n");
-        printf("2. Tai game da luu\n");
-        printf("0. Thoat\n");
-        printf("Chon: ");
-        scanf("%d", &option);
 
-        switch (option) {
-        case 1:
-            playGame();
-            break;
-        case 2:
-            continueGame();
-            break;
-        case 0:
-            printf("Tam biet!\n");
-            break;
-        default:
-            printf("Lua chon khong hop le!\n");
-        }
-    } while (option != 0);
-    return 0;
-}
-*/
