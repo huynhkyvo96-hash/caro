@@ -223,8 +223,16 @@ void playGame()
      char namex[30], nameo[30];
     printf("Nhap ten nguoi choi X: ");
     scanf(" %[^\n]", namex);
+    do
+{
     printf("Nhap ten nguoi choi O: ");
     scanf(" %[^\n]", nameo);
+    if (strcasecmp(namex, nameo) == 0)
+    {
+        printf("Ten bi trung, vui long nhap ten khac!\n");
+    }
+}
+while (strcasecmp(namex, nameo) == 0);
     printf("Nhap kich thuoc ban co (1-%d): ", MAX_SIZE);
         size=runboardgame();
         initializeBoard(board, size);
