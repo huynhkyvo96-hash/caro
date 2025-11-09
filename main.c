@@ -42,7 +42,7 @@ int runboardgame() {
             while (getchar() != '\n'); // xóa bộ đệm nếu nhập chữ
             continue;
         }
-        if (size <= 0 || size > 20) {
+        if (size <= 0 || MAX_SIZE > 20) {
             printf("Kich thuoc khong hop le! (1-20)\n");
             continue;
         }
@@ -213,23 +213,41 @@ void playGame() {
     int size;
     char board[MAX_SIZE][MAX_SIZE];
     char currentPlayer = 'X';
+     char namex[30],nameo[30];
+    printf("Nhap ten nguoi choi X: ");
+    scanf("%s",namex);
+    printf("Nhap ten nguoi choi O: ");
+    scanf("%s",nameo);
     printf("Nhap kich thuoc ban co (1-20): ");
         size=runboardgame();
         initializeBoard(board, size);
         printBoard(board, size);
-
-
+// Thêm để lưu vào file scores để hiển thị tên ai thăng và thua bao nhiêu.
     while (1) {
         makeMove(board, size, currentPlayer);
+        system("cls");
         printBoard(board, size);
 
         if (checkWin(board, size, currentPlayer)) {
             printf(" Nguoi choi %c thang\n", currentPlayer);
+            // Thêm phần này để trả giá trị lưu vào file người x thang bao nhiêu o bao nhiêu.
+            if (currentPlayer =='X')
+            {
+                SaveScores(namex,1,0,0);
+                SaveScores(nameo,0,1,0);
+            }
+            else
+            {
+                SaveScores(nameo,1,0,0);
+                SaveScores(namex,0,1,0);
+            }
             break;
         }
 
         if (checkTie(board, size)) {
-            printf(" Hòa rồi!\n");
+            printf(" Hoa roi!\n");
+            SaveScores(namex,0,0,1);
+            SaveScores(nameo,0,0,1);
             break;
         }
 
@@ -255,27 +273,43 @@ void continueGame() {
         return; // Không có file thì thoát
 
     printBoard(board, size);
+    char namex[30], nameo[30];
+    printf("Nhap ten nguoi choi X: ");
+    scanf("%s", namex);
+    printf("Nhap ten nguoi choi O: ");
+    scanf("%s", nameo);
 
     while (1) {
         makeMove(board, size, currentPlayer);
         printBoard(board, size);
 
+
         if (checkWin(board, size, currentPlayer)) {
             printf("Nguoi choi %c thang!\n", currentPlayer);
+            // Thêm cái này cũng như trên để tiế tuc game
+
+            if (currentPlayer == 'X') {
+                SaveScores(namex, 1, 0, 0);
+                SaveScores(nameo, 0, 1, 0);
+            } else {
+                SaveScores(nameo, 1, 0, 0);
+                SaveScores(namex, 0, 1, 0);
+            }
             break;
         }
 
         if (checkTie(board, size)) {
             printf("Hoa roi!\n");
+            SaveScores(namex, 0, 0, 1);
+            SaveScores(nameo, 0, 0, 1);
             break;
         }
 
         char ans;
         printf("Ban co muon luu game khong (y/n)? ");
         scanf(" %c", &ans);
-        if (ans == 'y' || ans == 'Y') {
+        if (ans == 'y' || ans == 'Y')
             saveGame(board, size, currentPlayer);
-        }
 
         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
@@ -290,17 +324,54 @@ typedef struct{
 } Player;
 
 //HÀM LƯU ĐIỂM VÀO FILE THẮNG BAO NHIÊU THUA BAO NHIÊU
-void SaveScores(char Player[],int win,int lose,int tie)
-{
-    FILE *f = fopen("scores.txt","a");// append mode: ghi thêm vào cuối file, đây là chức năng của đọc file trong C.
-    if (f==NULL)
-    {
-        printf("Khong the mo file scores.txt de ghi!\n");
+void SaveScores(char playerName[], int win, int lose, int tie) {
+    FILE *f = fopen("scores.txt", "r");
+    Player players[100];
+    int count = 0, found = 0;
+
+    // Nếu file chưa có thì tạo mới
+    if (f == NULL) {
+        f = fopen("scores.txt", "w");
+        fprintf(f, "%s %d %d %d\n", playerName, win, lose, tie);
+        fclose(f);
+        printf("Da tao file moi va luu diem cua %s!\n", playerName);
         return;
     }
-    fprintf(f, "%s %d %d %d\n",Player,win,lose,tie);
+
+    // Đọc toàn bộ danh sách người chơi
+    while (fscanf(f, "%s %d %d %d", players[count].name,
+                  &players[count].win, &players[count].lose, &players[count].tie) == 4)
+        count++;
     fclose(f);
-    printf("Diem cua %s da duoc luu!\n",Player);
+
+    // Cập nhật nếu trùng tên (không phân biệt hoa/thường)
+    for (int i = 0; i < count; i++) {
+        if (strcasecmp(players[i].name, playerName) == 0) {
+            players[i].win  += win;   // ✅ CỘNG DỒN
+            players[i].lose += lose;  // ✅ CỘNG DỒN
+            players[i].tie  += tie;   // ✅ CỘNG DỒN
+            found = 1;
+            break;
+        }
+    }
+
+    // Nếu chưa có tên, thêm mới
+    if (!found) {
+        strcpy(players[count].name, playerName);
+        players[count].win  = win;
+        players[count].lose = lose;
+        players[count].tie  = tie;
+        count++;
+    }
+
+    // Ghi toàn bộ danh sách ra file
+    f = fopen("scores.txt", "w");
+    for (int i = 0; i < count; i++)
+        fprintf(f, "%s %d %d %d\n", players[i].name,
+                players[i].win, players[i].lose, players[i].tie);
+    fclose(f);
+
+    printf("Diem cua %s da duoc cap nhat!\n", playerName);
 }
 
 //HÀM HIỂN THỊ TOP 10 NGƯỜI CHƠI
