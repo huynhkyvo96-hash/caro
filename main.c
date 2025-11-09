@@ -2,34 +2,23 @@
 #include <stdlib.h>
 #include <strings.h>
 #define MAX_SIZE 25
-// Kích thước tối đa của bàn cờ
 
-// Hàm khởi tạo bàn cờ (gán ký tự trống '.')
 void initializeBoard(char board[][MAX_SIZE], int size) {
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
+    for (int i = 0; i < size; i++)
+        for (int j = 0; j < size; j++)
             board[i][j] = '.';
-        }
-    }
 }
 
-// Hàm in bàn cờ ra màn hình
 void printBoard(char board[][MAX_SIZE], int size) {
-// xuống hàng rùi cách vô một đoạn
     printf("\n   ");
-// in theo dòng  (1 2 3 4 ...)
     for (int i = 0; i < size; i++)
         printf("%3d", i+1);
     printf("\n");
 
     for (int i = 0; i < size; i++) {
-        // in theo dạng cột (1 2 3 4 ...)
         printf("%2d ", i+1);
-        // in '.' theo dòng và cột
-        for (int j = 0; j < size; j++) {
+        for (int j = 0; j < size; j++)
             printf("%3c", board[i][j]);
-        }
-// xuống dòng in tiếp cột 2: "2 . . . . . . ." nếu quá size thì dừng (i<=size và j<=size)
         printf("\n");
     }
 }
@@ -37,10 +26,9 @@ void printBoard(char board[][MAX_SIZE], int size) {
 int runboardgame() {
     int size;
     while (1) {
-
         if (scanf("%d", &size) != 1) {
             printf("Error: You must enter an integer!\n");
-            while (getchar() != '\n'); // xóa bộ đệm nếu nhập chữ
+            while (getchar() != '\n');
             continue;
         }
         if (size <= 0 || size > MAX_SIZE) {
@@ -53,155 +41,295 @@ int runboardgame() {
     return size;
 }
 
-// ---------------- PHAN 2: DANH QUAN X / O ----------------
-
-// Hàm này giúp người chơi nhập tọa độ và đặt quân lên bàn cờ
-void makeMove(char board[][MAX_SIZE], int size, char player)
-{
+void makeMove(char board[][MAX_SIZE], int size, char player) {
     int row, col;
-
-    while (1) // Lặp cho đến khi nhập hợp lệ
-    {
+    while (1) {
         printf("Player %c, enter coordinates (row col): ", player);
         int kt = scanf("%d %d", &row, &col);
-        if (kt != 2) //nếu là chữ thì k được.
-    {
-            // dọn bộ đệm khi nhập sai kiểu
+        if (kt != 2) {
             int c;
-            while ((c = getchar()) != '\n' && c != EOF) {} //dọn dẹp bộ nhớ đệm tới nút enter
+            while ((c = getchar()) != '\n' && c != EOF) {}
             printf("Invalid input. Please enter 2 numbers.\n");
-            continue; //quay lại vòng while
-    }
-
-
-        // Kiểm tra tọa độ có nằm trong giới hạn bàn cờ không
+            continue;
+        }
         if (row < 1 || row > size || col < 1 || col > size) {
             printf("Invalid coordinates! Please enter (1-%d).\n", size);
             continue;
         }
-
-        // 🔸 Kiểm tra ô đã có quân hay chưa
         if (board[row - 1][col - 1] != '.') {
             printf("This cell is already taken! Choose another.\n");
             continue;
         }
-
-        //  Nếu hợp lệ → đặt quân vào vị trí
         board[row - 1][col - 1] = player;
-        break; // Thoát khỏi vòng lặp
+        break;
     }
 }
 
-// Hàm kiểm tra thắng cho player ('X' hoặc 'O').
-// Trả về 1 nếu player có 5 ô liên tiếp theo 1 trong 4 hướng,
-// ngược lại trả về 0.
 int checkWin(char board[][MAX_SIZE], int size, char player) {
     int i, j, k, count;
-
-    // Kiểm tra hàng ngang
-    for (i = 0; i < size; i++) {
+    for (i = 0; i < size; i++)
         for (j = 0; j <= size - 5; j++) {
             count = 0;
-            for (k = 0; k < 5; k++) {
+            for (k = 0; k < 5; k++)
                 if (board[i][j + k] == player) count++;
-            }
             if (count == 5) return 1;
         }
-    }
-
-    // Kiểm tra cột dọc
-    for (i = 0; i <= size - 5; i++) {
+    for (i = 0; i <= size - 5; i++)
         for (j = 0; j < size; j++) {
             count = 0;
-            for (k = 0; k < 5; k++) {
+            for (k = 0; k < 5; k++)
                 if (board[i + k][j] == player) count++;
-            }
             if (count == 5) return 1;
         }
-    }
-
-    // Kiểm tra đường chéo chính (\)
-    for (i = 0; i <= size - 5; i++) {
+    for (i = 0; i <= size - 5; i++)
         for (j = 0; j <= size - 5; j++) {
             count = 0;
-            for (k = 0; k < 5; k++) {
+            for (k = 0; k < 5; k++)
                 if (board[i + k][j + k] == player) count++;
-            }
             if (count == 5) return 1;
         }
-    }
-
-    // Kiểm tra đường chéo phụ (/)
-    for (i = 4; i < size; i++) {
+    for (i = 4; i < size; i++)
         for (j = 0; j <= size - 5; j++) {
             count = 0;
-            for (k = 0; k < 5; k++) {
+            for (k = 0; k < 5; k++)
                 if (board[i - k][j + k] == player) count++;
-            }
             if (count == 5) return 1;
         }
-    }
-
-    return 0; // Không thắng
+    return 0;
 }
 
-// Hàm kiểm tra hòa
 int checkTie(char board[][MAX_SIZE], int size) {
-    int i, j;
-    for (i = 0; i < size; i++) {
-        for (j = 0; j < size; j++) {
-            if (board[i][j] == '.') return 0; // còn ô trống, chưa hòa
-        }
-    }
-    return 1; // Hòa
+    for (int i = 0; i < size; i++)
+        for (int j = 0; j < size; j++)
+            if (board[i][j] == '.') return 0;
+    return 1;
 }
 
-
-// ---------------- PHẦN 4: LƯU & TẢI LẠI GAME (HOÀN CHỈNH) ----------------
-
-// Ghi bàn cờ, lượt chơi và tên người chơi vào file
 void saveGame(char board[][MAX_SIZE], int size, char currentPlayer, char namex[], char nameo[]) {
     FILE *f = fopen("save.txt", "w");
     if (f == NULL) {
         printf("Cannot open file to save game.\n");
         return;
     }
-
-    // Lưu size, lượt chơi hiện tại, tên X và O
     fprintf(f, "%d %c %s %s\n", size, currentPlayer, namex, nameo);
-
-    // Lưu trạng thái bàn cờ
     for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
+        for (int j = 0; j < size; j++)
             fprintf(f, "%c", board[i][j]);
-        }
         fprintf(f, "\n");
     }
-
     fclose(f);
     printf("Game successfully saved to save.txt!\n");
 }
 
-// Đọc bàn cờ, lượt chơi và tên người chơi từ file
 int loadGame(char board[][MAX_SIZE], int *size, char *currentPlayer, char namex[], char nameo[]) {
     FILE *f = fopen("save.txt", "r");
     if (f == NULL) {
         printf("No save file found. Start a new game.\n");
         return 0;
     }
-
     fscanf(f, "%d %c %s %s\n", size, currentPlayer, namex, nameo);
-
-    for (int i = 0; i < *size; i++) {
-        for (int j = 0; j < *size; j++) {
+    for (int i = 0; i < *size; i++)
+        for (int j = 0; j < *size; j++)
             fscanf(f, "%c", &board[i][j]);
-        }
-        fgetc(f); // đọc bỏ ký tự xuống dòng
-    }
-
     fclose(f);
     printf("Game successfully loaded!\n");
     return 1;
 }
 
-// Các phần còn lại cũng tương tự, chỉ đổi nội dung printf sang tiếng Anh, giữ nguyên ghi chú
+void playGame() {
+    int size;
+    char board[MAX_SIZE][MAX_SIZE];
+    char currentPlayer = 'X';
+    char namex[30], nameo[30];
+    printf("Enter name of player X: ");
+    scanf(" %[^\n]", namex);
+    do {
+        printf("Enter name of player O: ");
+        scanf(" %[^\n]", nameo);
+        if (strcasecmp(namex, nameo) == 0)
+            printf("Names are identical, please enter a different name!\n");
+    } while (strcasecmp(namex, nameo) == 0);
+    printf("Enter board size (1-%d): ", MAX_SIZE);
+    size = runboardgame();
+    initializeBoard(board, size);
+    printBoard(board, size);
+
+    while (1) {
+        makeMove(board, size, currentPlayer);
+        printf("\033[H\033[J");
+        printBoard(board, size);
+        if (checkWin(board, size, currentPlayer)) {
+            printf("Player %c wins!\n", currentPlayer);
+            break;
+        }
+        if (checkTie(board, size)) {
+            printf("It's a tie!\n");
+            break;
+        }
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+        char ans;
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
+        printf("Press Enter to continue, 's' to save game, 'e' to exit: ");
+        ans = getchar();
+        if (ans == 's' || ans == 'S') {
+            saveGame(board, size, currentPlayer, namex, nameo);
+            printf("Game saved!\n");
+            while ((c = getchar()) != '\n' && c != EOF);
+        } else if (ans == 'e' || ans == 'E') {
+            printf("Exiting game...\n");
+            return;
+        }
+    }
+}
+
+void continueGame() {
+    int size;
+    char board[MAX_SIZE][MAX_SIZE];
+    char currentPlayer;
+    char namex[30], nameo[30];
+    if (!loadGame(board, &size, &currentPlayer, namex, nameo)) return;
+    printBoard(board, size);
+
+    while (1) {
+        makeMove(board, size, currentPlayer);
+        printf("\033[H\033[J");
+        printBoard(board, size);
+        if (checkWin(board, size, currentPlayer)) {
+            printf("Player %c wins!\n", currentPlayer);
+            break;
+        }
+        if (checkTie(board, size)) {
+            printf("It's a tie!\n");
+            break;
+        }
+        char ans;
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
+        printf("Press Enter to continue, 's' to save game, 'e' to exit: ");
+        ans = getchar();
+        if (ans == 's' || ans == 'S') {
+            saveGame(board, size, currentPlayer, namex, nameo);
+            printf("Game saved!\n");
+            while ((c = getchar()) != '\n' && c != EOF);
+        } else if (ans == 'e' || ans == 'E') {
+            printf("Exiting game...\n");
+            return;
+        }
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+    }
+}
+
+typedef struct{
+    char name[30];
+    int win, lose, tie;
+} Player;
+
+void SaveScores(char playerName[], int win, int lose, int tie) {
+    FILE *f = fopen("scores.txt", "r");
+    Player players[100];
+    int count = 0, found = 0;
+
+    if (f == NULL) {
+        f = fopen("scores.txt", "w");
+        fprintf(f, "%s %d %d %d\n", playerName, win, lose, tie);
+        fclose(f);
+        printf("Created new file and saved score for %s!\n", playerName);
+        return;
+    }
+
+    while (fscanf(f, "%s %d %d %d", players[count].name,
+                  &players[count].win, &players[count].lose, &players[count].tie) == 4)
+        count++;
+    fclose(f);
+
+    for (int i = 0; i < count; i++) {
+        if (strcasecmp(players[i].name, playerName) == 0) {
+            players[i].win += win;
+            players[i].lose += lose;
+            players[i].tie += tie;
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        strcpy(players[count].name, playerName);
+        players[count].win  = win;
+        players[count].lose = lose;
+        players[count].tie  = tie;
+        count++;
+    }
+
+    f = fopen("scores.txt", "w");
+    for (int i = 0; i < count; i++)
+        fprintf(f, "%s %d %d %d\n", players[i].name,
+                players[i].win, players[i].lose, players[i].tie);
+    fclose(f);
+
+    printf("Score of %s has been updated!\n", playerName);
+}
+
+void ShowTopPlayers() {
+    FILE *f = fopen("scores.txt","r");
+    if (f==NULL) {
+        printf("No player data available!\n");
+        return;
+    }
+    Player list[100];
+    int count=0;
+
+    while(fscanf(f,"%s %d %d %d",list[count].name,&list[count].win,&list[count].lose,&list[count].tie)==4)
+        count++;
+    fclose(f);
+
+    for (int i=0; i<count-1; i++)
+        for(int j=i+1; j<count; j++)
+            if(list[i].win < list[j].win) {
+                Player tmp=list[i];
+                list[i]=list[j];
+                list[j]=tmp;
+            }
+
+    printf("\n===== TOP 10 PLAYERS  =====\n");
+    printf("%-15s %-5s %-5s %-5s\n","Name","Win","Lose","Tie");
+    for (int i = 0; i<count && i<10; i++)
+        printf("%-15s %-5d %-5d %-5d\n",list[i].name,list[i].win,list[i].lose,list[i].tie);
+}
+
+void ShowInstructions() {
+    printf("\n===== HOW TO PLAY CARO =====\n");
+    printf("1. Players enter coordinates (row col), e.g., 3 5\n");
+    printf("2. Player X goes first, O goes next.\n");
+    printf("3. Win when 5 consecutive marks (horizontal, vertical or diagonal).\n");
+    printf("4. You can save (y) or load an existing game.\n");
+    printf("5. Win/Lose/Tie scores are saved in scores.txt.\n");
+    printf("===================================\n");
+}
+
+int main() {
+    int option;
+    do {
+        printf("\n===== MAIN MENU =====\n");
+        printf("1. Start new game\n");
+        printf("2. Load saved game\n");
+        printf("3. View top 10 players\n");
+        printf("4. View instructions\n");
+        printf("0. Exit\n");
+        printf("Choose: ");
+        if (scanf("%d", &option) != 1) {
+            printf("Invalid input! Please enter a number.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+        switch (option) {
+            case 1: playGame(); break;
+            case 2: continueGame(); break;
+            case 3: ShowTopPlayers(); break;
+            case 4: ShowInstructions(); break;
+            case 0: printf("Goodbye!\n"); break;
+            default: printf("Invalid choice, please try again!\n");
+        }
+    } while (option != 0);
+    return 0;
+}
