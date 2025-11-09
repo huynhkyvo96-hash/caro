@@ -50,7 +50,8 @@ int runboardgame() {
     while (1) {
         if (scanf("%d", &size) != 1) {
             printf("Error: You must enter an integer!\n");
-            while (getchar() != '\n');
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF);
             continue;
         }
         if (size <= 0 || size > MAX_SIZE) {
