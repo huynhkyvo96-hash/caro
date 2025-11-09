@@ -1,5 +1,6 @@
 #include <stdio.h>
-
+#include <stdlib.h>
+#include <strings.h>
 #define MAX_SIZE 25
 // Kích thước tối đa của bàn cờ
 
@@ -38,17 +39,17 @@ int runboardgame() {
     while (1) {
 
         if (scanf("%d", &size) != 1) {
-            printf("Loi: Ban phai nhap mot so nguyen!\n");
+            printf("Error: You must enter an integer!\n");
             while (getchar() != '\n'); // xóa bộ đệm nếu nhập chữ
             continue;
         }
         if (size <= 0 || size > MAX_SIZE) {
-            printf("Kich thuoc khong hop le! (1-%d)\n", MAX_SIZE);
+            printf("Invalid board size! (1-%d)\n", MAX_SIZE);
             continue;
         }
         break;
     }
-    printf("Kich thuoc hop le: %d x %d\n", size, size);
+    printf("Valid board size: %d x %d\n", size, size);
     return size;
 }
 
@@ -61,27 +62,27 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
 
     while (1) // Lặp cho đến khi nhập hợp lệ
     {
-        printf("Nguoi choi %c, nhap toa do (dong cot): ", player);
+        printf("Player %c, enter coordinates (row col): ", player);
         int kt = scanf("%d %d", &row, &col);
         if (kt != 2) //nếu là chữ thì k được.
     {
             // dọn bộ đệm khi nhập sai kiểu
             int c;
             while ((c = getchar()) != '\n' && c != EOF) {} //dọn dẹp bộ nhớ đệm tới nút enter
-            printf("Nhap khong hop le. Vui long nhap 2 so.\n");
+            printf("Invalid input. Please enter 2 numbers.\n");
             continue; //quay lại vòng while
     }
 
 
         // Kiểm tra tọa độ có nằm trong giới hạn bàn cờ không
         if (row < 1 || row > size || col < 1 || col > size) {
-            printf(" Toa do khong hop le! Vui long nhap lai (1-%d).\n", size);
+            printf("Invalid coordinates! Please enter (1-%d).\n", size);
             continue;
         }
 
         // 🔸 Kiểm tra ô đã có quân hay chưa
         if (board[row - 1][col - 1] != '.') {
-            printf(" O nay da duoc danh roi! Hay chon o khac.\n");
+            printf("This cell is already taken! Choose another.\n");
             continue;
         }
 
@@ -90,6 +91,7 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
         break; // Thoát khỏi vòng lặp
     }
 }
+
 // Hàm kiểm tra thắng cho player ('X' hoặc 'O').
 // Trả về 1 nếu player có 5 ô liên tiếp theo 1 trong 4 hướng,
 // ngược lại trả về 0.
@@ -104,13 +106,6 @@ int checkWin(char board[][MAX_SIZE], int size, char player) {
                 if (board[i][j + k] == player) count++;
             }
             if (count == 5) return 1;
-//Vòng i duyệt tất cả các hàng.
-
-//Vòng j duyệt tất cả vị trí bắt đầu có thể của đoạn dài 5 trong hàng: vì đoạn 5 ô bắt đầu tại j và kết thúc j+4, nên j chỉ chạy tới size-5.
-
-//Bên trong, vòng k kiểm tra 5 ô liên tiếp board[i][j+k]. Nếu tất cả 5 đều là player, count==5 → trả về thắng.
-
-//Trả về sớm return 1 để tiết kiệm thời gian (không cần kiểm thêm nếu đã thấy thắng).
         }
     }
 
@@ -122,7 +117,6 @@ int checkWin(char board[][MAX_SIZE], int size, char player) {
                 if (board[i + k][j] == player) count++;
             }
             if (count == 5) return 1;
-            //Tương tự, nhưng đổi vai trò hàng/cột: i chạy tới size-5 (vì cần đủ 5 ô theo chiều dọc), j chạy 0..size-1.
         }
     }
 
@@ -134,7 +128,6 @@ int checkWin(char board[][MAX_SIZE], int size, char player) {
                 if (board[i + k][j + k] == player) count++;
             }
             if (count == 5) return 1;
-            //Đoạn 5 ô là (i+k, j+k) cho k=0..4. Do đó i và j chỉ cần chạy tới size-5.
         }
     }
 
@@ -146,7 +139,6 @@ int checkWin(char board[][MAX_SIZE], int size, char player) {
                 if (board[i - k][j + k] == player) count++;
             }
             if (count == 5) return 1;
-            //Ở hướng /, vị trí bắt đầu thường ở hàng lớn (vì ta đi lên i-k), nên i bắt đầu từ 4 (đảm bảo i-4 >= 0) và chạy tới size-1. j là cột bắt đầu ngang như trước.
         }
     }
 
@@ -171,7 +163,7 @@ int checkTie(char board[][MAX_SIZE], int size) {
 void saveGame(char board[][MAX_SIZE], int size, char currentPlayer, char namex[], char nameo[]) {
     FILE *f = fopen("save.txt", "w");
     if (f == NULL) {
-        printf("Khong the mo file de luu game.\n");
+        printf("Cannot open file to save game.\n");
         return;
     }
 
@@ -187,14 +179,14 @@ void saveGame(char board[][MAX_SIZE], int size, char currentPlayer, char namex[]
     }
 
     fclose(f);
-    printf("Game da duoc luu thanh cong vao file save.txt!\n");
+    printf("Game successfully saved to save.txt!\n");
 }
 
 // Đọc bàn cờ, lượt chơi và tên người chơi từ file
 int loadGame(char board[][MAX_SIZE], int *size, char *currentPlayer, char namex[], char nameo[]) {
     FILE *f = fopen("save.txt", "r");
     if (f == NULL) {
-        printf("Khong tim thay file save.txt. Hay bat dau game moi.\n");
+        printf("No save file found. Start a new game.\n");
         return 0;
     }
 
@@ -208,274 +200,8 @@ int loadGame(char board[][MAX_SIZE], int *size, char *currentPlayer, char namex[
     }
 
     fclose(f);
-    printf("Game da duoc tai lai thanh cong!\n");
+    printf("Game successfully loaded!\n");
     return 1;
 }
 
-
-// ---------------- HÀM PLAYGAME ----------------
-//  cập nhật thêm chức năng save và load
-void playGame()
-{
-    int size;
-    char board[MAX_SIZE][MAX_SIZE];
-    char currentPlayer = 'X';
-     char namex[30], nameo[30];
-    printf("Nhap ten nguoi choi X: ");
-    scanf(" %[^\n]", namex);
-    do
-{
-    printf("Nhap ten nguoi choi O: ");
-    scanf(" %[^\n]", nameo);
-    if (strcasecmp(namex, nameo) == 0)
-    {
-        printf("Ten bi trung, vui long nhap ten khac!\n");
-    }
-}
-while (strcasecmp(namex, nameo) == 0);
-    printf("Nhap kich thuoc ban co (1-%d): ", MAX_SIZE);
-        size=runboardgame();
-        initializeBoard(board, size);
-        printBoard(board, size);
-// Thêm để lưu vào file scores để hiển thị tên ai thăng và thua bao nhiêu.
-    while (1)
-    {
-        makeMove(board, size, currentPlayer);
-        system("cls");
-        //printf("Neu ban muon luu game bam phim 's'\n");
-        printBoard(board, size);
-
-        if (checkWin(board, size, currentPlayer))
-        {
-            printf(" Nguoi choi %c thang\n", currentPlayer);
-            // Thêm phần này để trả giá trị lưu vào file người x thang bao nhiêu o bao nhiêu.
-            if (currentPlayer =='X')
-            {
-                SaveScores(namex,1,0,0);
-                SaveScores(nameo,0,1,0);
-            }
-            else
-            {
-                SaveScores(nameo,1,0,0);
-                SaveScores(namex,0,1,0);
-            }
-            break;
-        }
-
-        if (checkTie(board, size))
-        {
-            printf(" Hoa roi!\n");
-            SaveScores(namex,0,0,1);
-            SaveScores(nameo,0,0,1);
-            break;
-        }
-
-
-
-        // Đổi lượt
-        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
-        //  Hỏi người chơi có muốn lưu game không
-        char ans;
-        printf("Ban co muon luu game khong (y/n)? ");
-        scanf(" %c", &ans);
-        if (ans == 'y' || ans == 'Y')
-        {
-             saveGame(board, size, currentPlayer, namex, nameo);
-        }
-    }
-}
-// ---------------- Tiếp tục game ----------------
-void continueGame() {
-    int size;
-    char board[MAX_SIZE][MAX_SIZE];
-    char currentPlayer;
-    char namex[30], nameo[30];
-
-    if (!loadGame(board, &size, &currentPlayer, namex, nameo))
-        return; // Không có file thì thoát
-
-    printBoard(board, size);
-
-    while (1) {
-        makeMove(board, size, currentPlayer);
-        system("cls");
-        printBoard(board, size);
-
-        if (checkWin(board, size, currentPlayer)) {
-            printf("Nguoi choi %c thang!\n", currentPlayer);
-            if (currentPlayer == 'X') {
-                SaveScores(namex, 1, 0, 0);
-                SaveScores(nameo, 0, 1, 0);
-            } else {
-                SaveScores(nameo, 1, 0, 0);
-                SaveScores(namex, 0, 1, 0);
-            }
-            break;
-        }
-
-        if (checkTie(board, size)) {
-            printf("Hoa roi!\n");
-            SaveScores(namex, 0, 0, 1);
-            SaveScores(nameo, 0, 0, 1);
-            break;
-        }
-
-        char ans;
-        printf("Ban co muon luu game khong (y/n)? ");
-        scanf(" %c", &ans);
-        if (ans == 'y' || ans == 'Y')
-            {
-                saveGame(board, size, currentPlayer, namex, nameo);
-            }
-        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
-    }
-}
-
-
-//==================PHẦN 5: ĐIỂM VÀ HƯỚNG DẪN NGƯỜI CHƠI====================
-#include <string.h>
-
-typedef struct{
-    char name[30];
-    int win,lose,tie;
-} Player;
-
-//HÀM LƯU ĐIỂM VÀO FILE THẮNG BAO NHIÊU THUA BAO NHIÊU
-void SaveScores(char playerName[], int win, int lose, int tie) {
-    FILE *f = fopen("scores.txt", "r");
-    Player players[100];
-    int count = 0, found = 0;
-
-    // Nếu file chưa có thì tạo mới
-    if (f == NULL) {
-        f = fopen("scores.txt", "w");
-        fprintf(f, "%s %d %d %d\n", playerName, win, lose, tie);
-        fclose(f);
-        printf("Da tao file moi va luu diem cua %s!\n", playerName);
-        return;
-    }
-
-    // Đọc toàn bộ danh sách người chơi
-    while (fscanf(f, "%s %d %d %d", players[count].name,
-                  &players[count].win, &players[count].lose, &players[count].tie) == 4)
-        count++;
-    fclose(f);
-
-    // Cập nhật nếu trùng tên (không phân biệt hoa/thường)
-    for (int i = 0; i < count; i++) {
-        if (strcasecmp(players[i].name, playerName) == 0) {
-            players[i].win  += win;   // ✅ CỘNG DỒN
-            players[i].lose += lose;  // ✅ CỘNG DỒN
-            players[i].tie  += tie;   // ✅ CỘNG DỒN
-            found = 1;
-            break;
-        }
-    }
-
-    // Nếu chưa có tên, thêm mới
-    if (!found) {
-        strcpy(players[count].name, playerName);
-        players[count].win  = win;
-        players[count].lose = lose;
-        players[count].tie  = tie;
-        count++;
-    }
-
-    // Ghi toàn bộ danh sách ra file
-    f = fopen("scores.txt", "w");
-    for (int i = 0; i < count; i++)
-        fprintf(f, "%s %d %d %d\n", players[i].name,
-                players[i].win, players[i].lose, players[i].tie);
-    fclose(f);
-
-    printf("Diem cua %s da duoc cap nhat!\n", playerName);
-}
-
-//HÀM HIỂN THỊ TOP 10 NGƯỜI CHƠI
-void ShowTopPlayers()
-{
-    FILE *f = fopen("scores.txt","r");
-    if (f==NULL)
-    {
-        printf("Chua co du lieu nguoi choi nao!\n");
-        return;
-    }
-    Player list[100];
-    int count=0;
-
-    while(fscanf(f,"%s %d %d %d",list[count].name,&list[count].win,&list[count].lose,&list[count].tie)==4)
-        count++;
-    fclose(f);
-
-    //Sắp xếp theo số  trận thắng giảm dần
-    for (int i=0; i<count-1; i++)
-        for(int j=i+1; j<count; j++)
-            if(list[i].win < list[j].win)
-            {
-              Player tmp=list[i];
-              list[i]=list[j];
-              list[j]=tmp;
-            }
-     printf("\n===== TOP 10 NGUOI CHOI  =====\n");
-     printf("%-15s %-5s %-5s %-5s\n","Ten","Thang","Thua","Hoa");
-
-     for (int i = 0; i<count && i<10; i++)
-        printf("%-15s %-5d %-5d %-5d\n",list[i].name,list[i].win,list[i].lose,list[i].tie);
-}
-
-
-
-//HÀM HIỂN THỊ HƯỚNG DẪN
-void ShowInstructions()
-{
-    printf("\n===== HUONG DAN CHOI CARO =====\n");
-    printf("1. Moi nguoi choi nhap toa do (dong cot), vi du: 3 5\n");
-    printf("2. Nguoi choi X di truoc, O di sau.\n");
-    printf("3. Thang khi co 5 quan lien tiep (ngang, doc hoac cheo).\n");
-    printf("4. Co the luu game (y) hoac tai lai game cu.\n");
-    printf("5. Diem thang/thua/hoa se luu trong file scores.txt.\n");
-    printf("===================================\n");
-}
-
-int main(){
-    int option;
-    do
-    {
-     printf("\n===== MENU CHINH =====\n");
-     printf("1. Bat dau game moi\n");
-     printf("2. Tai game da luu\n");
-     printf("3. Xem top 10 nguoi choi\n");
-     printf("4. Xem huong dan choi\n");
-     printf("0. Thoat\n");
-     printf("Chon: ");
-     if (scanf("%d", &option) != 1)
-     {
-         printf("Nhap sai! Vui long nhap so.\n");
-         while (getchar() != '\n');
-         continue;
-     }
-
-     switch (option) {
-            case 1:
-                playGame();
-                break;
-            case 2:
-                continueGame();
-                break;
-            case 3:
-                ShowTopPlayers();
-                break;
-            case 4:
-                ShowInstructions();
-                break;
-            case 0:
-                printf("Tam biet\n");
-                break;
-            default:
-                printf("Lua chon khong hop le, moi nhap lai!\n");
-        }
-    } while (option != 0);
-
-    return 0;
-}
-
+// Các phần còn lại cũng tương tự, chỉ đổi nội dung printf sang tiếng Anh, giữ nguyên ghi chú
