@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
@@ -47,19 +46,26 @@ void printBoard(char board[][MAX_SIZE], int size) {
 
 int runboardgame() {
     int size;
+    char ch;
+
     while (1) {
-        if (scanf("%d", &size) != 1) {
+
+        if (scanf("%d%c", &size, &ch) != 2 || ch != '\n') {
             printf("Error: You must enter an integer!\n");
+            printf("Enter board size (1-%d): ", MAX_SIZE);
             int c;
             while ((c = getchar()) != '\n' && c != EOF);
             continue;
         }
+
         if (size <= 0 || size > MAX_SIZE) {
             printf("Invalid size! (1-%d)\n", MAX_SIZE);
             continue;
         }
+
         break;
     }
+
     printf("Valid board size: %d x %d\n", size, size);
     return size;
 }
@@ -72,7 +78,7 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
 
     while (1)
     {
-        printf("Player %c, enter coordinates (row column) [0 0 = save | 0 1 = exit to menu]: ", player);
+        printf("Player %c, enter coordinates (row column): ", player);
         int kt = scanf("%d %d", &row, &col);
         if (kt != 2)
         {
@@ -83,25 +89,29 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
         }
 
         // --- Lệnh đặc biệt ---
-        if (row == 0 && col == 0) {
+        if (row == 0 && col == 0)
+        {
             saveGame(board, boardsize, currentPlayerGlobal, namex, nameo);
             printf("Game saved! Continue playing...\n");
             continue;
         }
 
-        if (row == 0 && col == 1) {
+        if (row == 0 && col == 1)
+        {
             printf("Exiting current match, returning to menu...\n");
-            exitToMenu = 1; // báo cho vòng lặp chính biết để thoát ra menu
+            exitToMenu = 1;
             return;
         }
         // ---------------------
 
-        if (row < 1 || row > size || col < 1 || col > size) {
+        if (row < 1 || row > size || col < 1 || col > size)
+        {
             printf("Invalid coordinates! Please enter values (1-%d).\n", size);
             continue;
         }
 
-        if (board[row - 1][col - 1] != '.') {
+        if (board[row - 1][col - 1] != '.')
+        {
             printf("This cell is already taken! Choose another one.\n");
             continue;
         }
@@ -110,7 +120,6 @@ void makeMove(char board[][MAX_SIZE], int size, char player)
         break;
     }
 }
-
 
 int checkWin(char board[][MAX_SIZE], int size, char player) {
     int i, j, k, count;
@@ -217,7 +226,7 @@ void playGame()
     char board[MAX_SIZE][MAX_SIZE];
     char currentPlayer = 'X';
     currentPlayerGlobal = currentPlayer;
-    exitToMenu = 0; // reset cờ thoát
+    exitToMenu = 0;
 
     printf("Enter player X name: ");
     scanf(" %[^\n]", namex);
@@ -236,24 +245,28 @@ void playGame()
     while (1) {
         currentPlayerGlobal = currentPlayer;
         makeMove(board, boardsize, currentPlayer);
-        if (exitToMenu) return; // người chơi nhập 0 1 → quay lại menu
-
+        if (exitToMenu) return;
         printf("\033[H\033[J");
+        printf("Note: [0 0 = save | 0 1 = exit to menu]");
         printBoard(board, boardsize);
 
-        if (checkWin(board, boardsize, currentPlayer)) {
+        if (checkWin(board, boardsize, currentPlayer))
+        {
             printf("Player %c wins!\n", currentPlayer);
-            if (currentPlayer == 'X') {
+            if (currentPlayer == 'X')
+            {
                 SaveScores(namex, 1, 0, 0);
                 SaveScores(nameo, 0, 1, 0);
-            } else {
+            } else
+            {
                 SaveScores(nameo, 1, 0, 0);
                 SaveScores(namex, 0, 1, 0);
             }
             break;
         }
 
-        if (checkTie(board, boardsize)) {
+        if (checkTie(board, boardsize))
+        {
             printf("It's a tie!\n");
             SaveScores(namex, 0, 0, 1);
             SaveScores(nameo, 0, 0, 1);
@@ -274,14 +287,14 @@ void continueGame() {
         return;
 
     currentPlayerGlobal = currentPlayer;
-    exitToMenu = 0; // reset cờ
+    exitToMenu = 0;
     printBoard(board, boardsize);
 
     while (1) {
         currentPlayerGlobal = currentPlayer;
         makeMove(board, boardsize, currentPlayer);
-        if (exitToMenu) return; // quay lại menu nếu người chơi nhập 0 1
-
+        if (exitToMenu) return;
+        printf("Note: [0 0 = save | 0 1 = exit to menu]");
         printf("\033[H\033[J");
         printBoard(board, boardsize);
 
@@ -311,9 +324,9 @@ void continueGame() {
 
 
 // ================== SCORES & INSTRUCTIONS =====================
-typedef struct{
+typedef struct {
     char name[30];
-    int win,lose,tie;
+    int win, lose, tie;
 } Player;
 
 void SaveScores(char playerName[], int win, int lose, int tie) {
@@ -321,18 +334,24 @@ void SaveScores(char playerName[], int win, int lose, int tie) {
     Player players[100];
     int count = 0, found = 0;
 
+
     if (f == NULL) {
         f = fopen("scores.txt", "w");
-        fprintf(f, "%s %d %d %d\n", playerName, win, lose, tie);
+        fprintf(f, "\"%s\" %d %d %d\n", playerName, win, lose, tie);
         fclose(f);
         printf("New file created. Scores saved for %s!\n", playerName);
         return;
     }
 
-    while (fscanf(f, "%s %d %d %d", players[count].name,
-                  &players[count].win, &players[count].lose, &players[count].tie) == 4)
+
+    while (fscanf(f, " \"%[^\"]\" %d %d %d",
+                  players[count].name,
+                  &players[count].win,
+                  &players[count].lose,
+                  &players[count].tie) == 4)
         count++;
     fclose(f);
+
 
     for (int i = 0; i < count; i++) {
         if (strcasecmp(players[i].name, playerName) == 0) {
@@ -344,6 +363,7 @@ void SaveScores(char playerName[], int win, int lose, int tie) {
         }
     }
 
+
     if (!found) {
         strcpy(players[count].name, playerName);
         players[count].win  = win;
@@ -352,52 +372,64 @@ void SaveScores(char playerName[], int win, int lose, int tie) {
         count++;
     }
 
+
     f = fopen("scores.txt", "w");
     for (int i = 0; i < count; i++)
-        fprintf(f, "%s %d %d %d\n", players[i].name,
-                players[i].win, players[i].lose, players[i].tie);
+        fprintf(f, "\"%s\" %d %d %d\n",
+                players[i].name,
+                players[i].win,
+                players[i].lose,
+                players[i].tie);
     fclose(f);
 
     printf("Scores updated for %s!\n", playerName);
 }
 
-void ShowTopPlayers()
-{
-    FILE *f = fopen("scores.txt","r");
-    if (f==NULL)
-    {
+void ShowTopPlayers() {
+    FILE *f = fopen("scores.txt", "r");
+    if (f == NULL) {
         printf("No player data available!\n");
         return;
     }
-    Player list[100];
-    int count=0;
 
-    while(fscanf(f,"%s %d %d %d",list[count].name,&list[count].win,&list[count].lose,&list[count].tie)==4)
+    Player list[100];
+    int count = 0;
+
+
+    while (fscanf(f, " \"%[^\"]\" %d %d %d",
+                  list[count].name,
+                  &list[count].win,
+                  &list[count].lose,
+                  &list[count].tie) == 4)
         count++;
     fclose(f);
 
-    for (int i=0; i<count-1; i++)
-        for(int j=i+1; j<count; j++)
-            if(list[i].win < list[j].win)
-            {
-              Player tmp=list[i];
-              list[i]=list[j];
-              list[j]=tmp;
+
+    for (int i = 0; i < count - 1; i++)
+        for (int j = i + 1; j < count; j++)
+            if (list[i].win < list[j].win) {
+                Player tmp = list[i];
+                list[i] = list[j];
+                list[j] = tmp;
             }
-     printf("\n===== TOP 10 PLAYERS =====\n");
-     printf("%-15s %-5s %-5s %-5s\n","Name","Win","Lose","Tie");
 
-     for (int i = 0; i<count && i<10; i++)
-        printf("%-15s %-5d %-5d %-5d\n",list[i].name,list[i].win,list[i].lose,list[i].tie);
+    printf("\n===== TOP 10 PLAYERS =====\n");
+    printf("%-20s %-5s %-5s %-5s\n", "Name", "Win", "Lose", "Tie");
+
+    for (int i = 0; i < count && i < 10; i++)
+        printf("%-20s %-5d %-5d %-5d\n",
+               list[i].name,
+               list[i].win,
+               list[i].lose,
+               list[i].tie);
 }
-
 void ShowInstructions()
 {
     printf("\n===== HOW TO PLAY CARO =====\n");
     printf("1. Each player enters coordinates (row column), e.g., 3 5\n");
     printf("2. Player X goes first, O goes second.\n");
     printf("3. Win by placing 5 consecutive pieces (horizontal, vertical, or diagonal).\n");
-    printf("4. You can save ('s') or load ('e') a game.\n");
+    printf("4. You can save ('0 0') or exit ('0 1') a game.\n");
     printf("5. Win/Lose/Tie scores are saved in scores.txt.\n");
     printf("===================================\n");
 }
